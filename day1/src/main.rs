@@ -1,22 +1,20 @@
-use std::error::Error;
-use std::{env, fs, io};
+use std::{fs, io};
 use std::collections::HashMap;
+use std::error::Error;
 use std::num::ParseIntError;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    println!("{}", env::current_dir()?.display());
     let input = load_inputs("day1/day1pt1.txt")?;
 
     let elves = parse_into_elves(input)?;
 
-    println!("{:?}", elves);
-
     let mut elves_vec: Vec<(&u32, &u32)> = elves.iter().collect();
     elves_vec.sort_by(|a, b| b.1.cmp(a.1));
 
-    println!("Elves sorted by calorie count:\n{:?}", elves_vec);
-
-    println!("The elf with the most calories is: {:?}", elves_vec.get(0).unwrap());
+    println!("The top three elves are: {:?}, {:?}, {:?}",
+            elves_vec.get(0).unwrap(),
+            elves_vec.get(1).unwrap(),
+            elves_vec.get(2).unwrap());
 
     Ok(())
 }
