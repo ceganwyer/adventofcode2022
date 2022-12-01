@@ -4,7 +4,7 @@ use std::error::Error;
 use std::num::ParseIntError;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let input = load_inputs("day1/day1pt1.txt")?;
+    let input = load_inputs("day1/day1.txt")?;
 
     let elves = parse_into_elves(input)?;
 
