@@ -4,15 +4,21 @@ use std::error::Error;
 use aoc_day2 as AoC;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let input = fs::read_to_string("day2/day2.txt")?;
+    use std::time::Instant;
+    let now = Instant::now();
+    {
+        let input = fs::read_to_string("day2/day2.txt")?;
 
-    let rounds: Vec<&str> = input.lines().collect();
+        let rounds: Vec<&str> = input.lines().collect();
 
-    let rounds = AoC::parse_tournament(&rounds)?;
+        let rounds = AoC::parse_tournament(&rounds)?;
 
-    let (opp, user) = AoC::eval_tournament(rounds);
+        let (opp, user) = AoC::eval_tournament(rounds);
 
-    println!("Final score: {} - {}", opp, user);
-
+        println!("Final score: {} - {}", opp, user);
+    }
+    let elapsed = now.elapsed();
+    println!("Elapsed: {:.2?}", elapsed);
+    
     Ok(())
 }

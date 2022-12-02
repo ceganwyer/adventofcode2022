@@ -1,20 +1,26 @@
-use std::{fs, io};
+use std::{fs};
 use std::collections::HashMap;
 use std::error::Error;
 use std::num::ParseIntError;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let input = fs::read_to_string("day1/day1.txt")?;
+    use std::time::Instant;
+    let now = Instant::now();
+    {
+        let input = fs::read_to_string("day1/day1.txt")?;
 
-    let elves = parse_into_elves(input)?;
+        let elves = parse_into_elves(input)?;
 
-    let mut elves_vec: Vec<(&u32, &u32)> = elves.iter().collect();
-    elves_vec.sort_by(|a, b| b.1.cmp(a.1));
+        let mut elves_vec: Vec<(&u32, &u32)> = elves.iter().collect();
+        elves_vec.sort_by(|a, b| b.1.cmp(a.1));
 
-    println!("The top three elves are: {:?}, {:?}, {:?}",
-            elves_vec.get(0).unwrap(),
-            elves_vec.get(1).unwrap(),
-            elves_vec.get(2).unwrap());
+        println!("The top three elves are: {:?}, {:?}, {:?}",
+                 elves_vec.get(0).unwrap(),
+                 elves_vec.get(1).unwrap(),
+                 elves_vec.get(2).unwrap());
+    }
+    let elapsed = now.elapsed();
+    println!("Elapsed: {:.2?}", elapsed);
 
     Ok(())
 }
