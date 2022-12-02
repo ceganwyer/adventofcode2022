@@ -4,7 +4,7 @@ use std::error::Error;
 use std::num::ParseIntError;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let input = load_inputs("day1/day1.txt")?;
+    let input = fs::read_to_string("day1/day1.txt")?;
 
     let elves = parse_into_elves(input)?;
 
@@ -17,10 +17,6 @@ fn main() -> Result<(), Box<dyn Error>> {
             elves_vec.get(2).unwrap());
 
     Ok(())
-}
-
-fn load_inputs(path: &str) -> Result<String, io::Error> {
-    fs::read_to_string(path)
 }
 
 fn parse_into_elves(input: String) -> Result<HashMap<u32, u32>, ParseIntError> {
