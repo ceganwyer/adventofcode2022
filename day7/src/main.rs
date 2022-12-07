@@ -1,3 +1,5 @@
+use std::fs;
+
 fn main() {
-    unimplemented!();
+    let input = fs::read_to_string("day7/sample.txt");
 }
