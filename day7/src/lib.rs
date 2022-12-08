@@ -1,5 +1,5 @@
+use eyre::{eyre, Result, WrapErr};
 use std::collections::HashMap;
-use eyre::{WrapErr, Result, eyre};
 
 pub type TreeIndex = usize;
 
@@ -13,7 +13,7 @@ impl Tree {
     pub fn new() -> Self {
         Tree {
             arena: Vec::new(),
-            root: None
+            root: None,
         }
     }
 
@@ -44,7 +44,7 @@ impl Tree {
             node.as_ref()
         } else {
             None
-        }
+        };
     }
 
     pub fn node_at_mut(&mut self, index: TreeIndex) -> Option<&mut Node> {
@@ -52,7 +52,7 @@ impl Tree {
             node.as_mut()
         } else {
             None
-        }
+        };
     }
 
     pub fn find_node(&self, name: &str) -> Option<TreeIndex> {
@@ -60,7 +60,7 @@ impl Tree {
         for node in self.arena.iter() {
             if let Some(node) = node {
                 if node.name == name {
-                    return Some(index)
+                    return Some(index);
                 }
                 index += 1;
             }
@@ -68,11 +68,16 @@ impl Tree {
         None
     }
 
-    pub fn create_new_child(&mut self, parent_index: TreeIndex, name: &str, size: Option<i32>)
-    -> Result<TreeIndex> {
+    pub fn create_new_child(
+        &mut self,
+        parent_index: TreeIndex,
+        name: &str,
+        size: Option<i32>,
+    ) -> Result<TreeIndex> {
         let new_child = Node::new(name.to_string(), size, Vec::new(), Some(parent_index));
         let index = self.add_node(new_child);
-        let parent = self.node_at_mut(parent_index)
+        let parent = self
+            .node_at_mut(parent_index)
             .ok_or_else(|| eyre!("Couldn't find parent node at {}", parent_index))?;
         parent.children.push(index);
 
@@ -81,19 +86,15 @@ impl Tree {
 }
 
 pub struct PreorderIter {
-    stack: Vec<TreeIndex>
+    stack: Vec<TreeIndex>,
 }
 
 impl PreorderIter {
     pub fn new(root: Option<TreeIndex>) -> Self {
         if let Some(index) = root {
-            PreorderIter {
-                stack: vec![index]
-            }
+            PreorderIter { stack: vec![index] }
         } else {
-            PreorderIter {
-                stack: vec![]
-            }
+            PreorderIter { stack: vec![] }
         }
     }
 
@@ -103,7 +104,7 @@ impl PreorderIter {
                 self.stack.append(node.children.clone().as_mut())
             }
 
-            return Some(node_index)
+            return Some(node_index);
         }
 
         None
@@ -119,12 +120,17 @@ pub struct Node {
 }
 
 impl Node {
-    pub fn new(name: String, size: Option<i32>, children: Vec<TreeIndex>, parent: Option<TreeIndex>) -> Self {
+    pub fn new(
+        name: String,
+        size: Option<i32>,
+        children: Vec<TreeIndex>,
+        parent: Option<TreeIndex>,
+    ) -> Self {
         Node {
             name,
             size,
             children,
-            parent
+            parent,
         }
     }
 }
@@ -151,17 +157,17 @@ fn parse_commands(input: String, mut tree: Tree) -> Result<Tree> {
             "cd" => {
                 let name = suffix.ok_or_else(|| eyre!("No suffix found!"))?;
                 current_node_index = process_cd(name, current_node_index, &tree)?;
-            },
+            }
             "ls" => continue,
             "dir" => {
                 let name = suffix.ok_or_else(|| eyre!("No suffix found!"))?;
                 tree.create_new_child(current_node_index, name, None)?;
-            },
+            }
             _ => {
                 let size: i32 = prefix.parse().wrap_err("Unable to parse file size!")?;
                 let name = suffix.ok_or_else(|| eyre!("No suffix found!"))?;
                 tree.create_new_child(current_node_index, name, Some(size))?;
-            },
+            }
         }
     }
     Ok(tree)
@@ -169,12 +175,14 @@ fn parse_commands(input: String, mut tree: Tree) -> Result<Tree> {
 
 fn process_cd(name: &str, mut current_node_index: TreeIndex, tree: &Tree) -> Result<TreeIndex> {
     if name == ".." {
-        current_node_index = tree.node_at(current_node_index)
+        current_node_index = tree
+            .node_at(current_node_index)
             .ok_or_else(|| eyre!("No node found at {}!", current_node_index))?
             .parent
             .ok_or_else(|| eyre!("No parent found!"))?;
     } else {
-        current_node_index = tree.find_node(name)
+        current_node_index = tree
+            .find_node(name)
             .ok_or_else(|| eyre!("Node {} not found!", name))?
     }
     Ok(current_node_index)
@@ -186,9 +194,8 @@ pub fn sum_directories(mut tree: Tree) -> HashMap<String, i32> {
     while let Some(node_index) = iter.next(&tree) {
         if let Some(node) = tree.node_at(node_index) {
             if node.size == None {
-                println!("Calculating: {}", node.name);
                 let entry = results.entry(node.name.clone()).or_insert(0);
-                let size = calc_dir_size(node_index, 0, &tree);
+                let size = calc_dir_size(node_index, &tree);
                 *entry = size;
             }
         }
@@ -196,17 +203,14 @@ pub fn sum_directories(mut tree: Tree) -> HashMap<String, i32> {
     results
 }
 
-fn calc_dir_size(node_index: TreeIndex, mut accum: i32, tree: &Tree) -> i32 {
+fn calc_dir_size(node_index: TreeIndex, tree: &Tree) -> i32 {
+    let mut size = 0;
     if let Some(node) = tree.node_at(node_index) {
-        println!("{} - {:?}: {}", node.name, node.size, accum);
-        if node.children.is_empty() {
-            accum += node.size.unwrap_or(0);
-        } else {
-            for child in &node.children {
-                accum += calc_dir_size(child.clone(), accum, &tree);
-            }
+        size = node.size.unwrap_or(0);
+        for child in &node.children {
+            size += calc_dir_size(child.clone(), &tree);
         }
     }
-
-    accum
+    size
 }
+
