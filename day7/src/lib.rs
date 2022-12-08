@@ -175,11 +175,20 @@ fn parse_commands(input: String, mut tree: Tree) -> Result<Tree> {
 
 fn process_cd(name: &str, mut current_node_index: TreeIndex, tree: &Tree) -> Result<TreeIndex> {
     if name == ".." {
+        if current_node_index == 0 {
+            return Ok(current_node_index);
+        }
         current_node_index = tree
             .node_at(current_node_index)
             .ok_or_else(|| eyre!("No node found at {}!", current_node_index))?
             .parent
-            .ok_or_else(|| eyre!("No parent found!"))?;
+            .ok_or_else(|| {
+                eyre!(
+                    "No parent found when switching from index {} to {}",
+                    current_node_index,
+                    name
+                )
+            })?;
     } else {
         current_node_index = tree
             .find_node(name)
@@ -206,11 +215,10 @@ pub fn sum_directories(mut tree: Tree) -> HashMap<String, i32> {
 fn calc_dir_size(node_index: TreeIndex, tree: &Tree) -> i32 {
     let mut size = 0;
     if let Some(node) = tree.node_at(node_index) {
-        size = node.size.unwrap_or(0);
+        size += node.size.unwrap_or(0);
         for child in &node.children {
             size += calc_dir_size(child.clone(), &tree);
         }
     }
     size
 }
-
