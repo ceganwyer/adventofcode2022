@@ -16,6 +16,13 @@ name = "aoc-day1"
 version = "0.1.0"
 
 [[package]]
+name = "aoc-day10"
+version = "0.1.0"
+dependencies = [
+ "eyre",
+]
+
+[[package]]
 name = "aoc-day2"
 version = "0.1.0"
 

@@ -1,0 +1,9 @@
+[package]
+name = "aoc-day10"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+eyre = "0.6.8"
+
